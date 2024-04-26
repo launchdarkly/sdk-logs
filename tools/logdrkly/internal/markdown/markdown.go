@@ -64,7 +64,6 @@ func (w *Writer) WriteSection(title string, content func()) {
 	}()
 
 	content()
-	w.WriteBlankLn()
 }
 
 func (w *Writer) AppendMarkdown(path string) error {
