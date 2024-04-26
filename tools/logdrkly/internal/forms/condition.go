@@ -27,10 +27,6 @@ func NewConditionFormPart1(codes *logs.LdLogCodesJson, condition *ConditionFormD
 		classOptions = append(classOptions, huh.NewOption(className, className))
 	})
 
-	for className := range codes.Classes {
-		classOptions = append(classOptions, huh.NewOption(className, className))
-	}
-
 	return huh.NewForm(huh.NewGroup(
 		huh.NewSelect[string]().Title("Select system:").Options(systemOptions...).Value(&condition.System),
 		huh.NewSelect[string]().Title("Select class:").Options(classOptions...).Value(&condition.Class),
