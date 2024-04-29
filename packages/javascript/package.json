@@ -7,11 +7,11 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./esm/src/codes.d.ts",
+        "types": "./esm/codes.d.ts",
         "default": "./esm/codes.js"
       },
       "require": {
-        "types": "./cjs/src/codes.d.ts",
+        "types": "./cjs/codes.d.ts",
         "default": "./cjs/codes.js"
       }
     }
