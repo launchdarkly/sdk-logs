@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "LaunchDarkly Log Codes and Messages",
   "license": "Apache-2.0",
-  "main": "./dist/cjs/bundle.cjs.js",
+  "main": "./cjs/codes.js",
+  "types": "./cjs/codes.d.ts",
   "exports": {
     ".": {
       "import": {
