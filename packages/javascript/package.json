@@ -1,0 +1,37 @@
+{
+  "name": "@launchdarkly/sdk-logs-js",
+  "version": "0.0.1",
+  "description": "LaunchDarkly Log Codes and Messages",
+  "license": "Apache-2.0",
+  "main": "./dist/cjs/bundle.cjs.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./esm/src/codes.d.ts",
+        "default": "./esm/codes.js"
+      },
+      "require": {
+        "types": "./cjs/src/codes.d.ts",
+        "default": "./cjs/codes.js"
+      }
+    }
+  },
+  "homepage": "https://github.com/launchdarkly/sdk-logs/tree/main/packages/javascript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/launchdarkly/sdk-logs.git"
+  },
+  "scripts": {
+    "genSchema": "npx json2ts ../../definition/schema/ld_log_codes.json ./tool/ld_log_codes.d.ts",
+    "generate": "npm run genSchema && npx ts-node ./tool/generate.ts",
+    "build-cjs": "tsc src/codes.ts --types --module commonjs --outDir ./cjs -d",
+    "build-esm": "tsc src/codes.ts --types --module es6 --outDir ./esm -d",
+    "build": "npm run build-cjs && npm run build-esm"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "json-schema-to-ts": "^3.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
