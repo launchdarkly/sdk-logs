@@ -23,8 +23,8 @@
     "url": "https://github.com/launchdarkly/sdk-logs.git"
   },
   "scripts": {
-    "genSchema": "npx json2ts ../../definition/schema/ld_log_codes.json ./tool/ld_log_codes.d.ts",
-    "generate": "npm run genSchema && npx ts-node ./tool/generate.ts",
+    "generate-schema": "npx json2ts ../../definition/schema/ld_log_codes.json ./tool/ld_log_codes.d.ts",
+    "generate": "npm run generate-schema && npx ts-node ./tool/generate.ts",
     "build-cjs": "tsc src/codes.ts --types --module commonjs --outDir ./cjs -d",
     "build-esm": "tsc src/codes.ts --types --module es6 --outDir ./esm -d",
     "build": "npm run build-cjs && npm run build-esm"
