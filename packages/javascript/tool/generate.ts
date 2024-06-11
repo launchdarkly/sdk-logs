@@ -2,7 +2,8 @@ import * as fsp from 'node:fs/promises';
 import {
   LogCodes,
   Condition,
-  Message
+  Message,
+  System
 } from './ld_log_codes';
 
 const reservedWords = [
@@ -160,6 +161,12 @@ async function main() {
     });
   }
 
+  async function writeGenericDocComment(definition: {description: string}) {
+    await withDocComment(async () => {
+      await writeCommentLn(definition.description);
+    });
+  }
+
   await writeLn('/* eslint-disable prettier/prettier */');
   await writeLn('/* eslint-disable @typescript-eslint/no-unused-vars */');
   await writeLn('/* eslint-disable @typescript-eslint/naming-convention */');
@@ -167,8 +174,10 @@ async function main() {
   await writeLn('');
 
   for (let [systemName, system] of Object.entries(definitions.systems)) {
+    await writeGenericDocComment(system);
     await scoped(`export const ${makeObjectIdentifier(systemName)} = {`, `}`, async () => {
       for (let [clsName, cls] of Object.entries(definitions.classes)) {
+        await writeGenericDocComment(cls);
         await scoped(`${capitalize(clsName)}: {`, `},`, async () => {
           for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
             if (condition.system == system.specifier && condition.class == cls.specifier) {
