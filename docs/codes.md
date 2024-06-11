@@ -74,8 +74,8 @@ The LaunchDarkly data source received a payload with invalid JSON.
 
 | parameter | description |
 |-----------|-------------|
-| type | The type of the message. For example "put", "patch", or "delete". |
 | connection | The type of the connection. Should be capitalized. Examples: "Streaming" or "Polling" |
+| type | The type of the message. For example "put", "patch", or "delete". |
 #### 10:5:1 - invalidPayload
 
 The data source received an invalid payload. The JSON was correctly formed, but the data did not match the expected schema.
