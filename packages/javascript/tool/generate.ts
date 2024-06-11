@@ -140,8 +140,6 @@ async function main() {
 
   async function writeMessageFunctionDocComment(definition: Condition) {
     await withDocComment(async () => {
-      await writeCommentLn(definition.description);
-      await writeCommentBlank();
       await writeCommentLn('Generate a log string for this code.');
       await writeCommentBlank();
       await writeCommentLn('This function will automatically include the log code.');
@@ -155,8 +153,6 @@ async function main() {
 
   async function writeCodeFunctionDocComment(definition: Condition) {
     await withDocComment(async () => {
-      await writeCommentLn(definition.description);
-      await writeCommentBlank();
       await writeCommentLn('Get the code for this condition.');
     });
   }
@@ -181,7 +177,7 @@ async function main() {
         await scoped(`${capitalize(clsName)}: {`, `},`, async () => {
           for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
             if (condition.system == system.specifier && condition.class == cls.specifier) {
-              await writeCondition(condition, systemName, clsName, conditionCode);
+              await writeCondition(condition, conditionCode);
             }
           }
         });
@@ -189,7 +185,8 @@ async function main() {
     });
   }
 
-  async function writeCondition(condition: Condition, systemName: string, className: string, conditionCode: string) {
+  async function writeCondition(condition: Condition, conditionCode: string) {
+    await writeGenericDocComment(condition);
     await scoped(`${makeObjectIdentifier(condition.name)}: {`, `},`, async () => {
       await writeMessageFunctionDocComment(condition);
       await scoped(`message:(${makeParams(condition.message)}) => {`, '},', async () => {
