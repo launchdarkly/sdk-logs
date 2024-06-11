@@ -70,7 +70,7 @@ func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Conditi
 		className, _, _ := collections.MapFind(cw.codes.Classes, func(s string, class logs.Class) bool {
 			return class.Specifier == condition.Class
 		})
-		fmt.Println("Writing condition:", condition.Name, "of system", sysName, "with class", className)
+		//fmt.Println("Writing condition:", condition.Name, "of system", sysName, "with class", className)
 
 		cw.writer.WriteLn(condition.Description)
 		cw.writer.WriteBlankLn()
@@ -95,13 +95,13 @@ func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Conditi
 		fragment := fmt.Sprintf("%s/%s_%s_%s.md", cw.fragmentPath, sysName, className, condition.Name)
 
 		if _, err := os.Stat(fragment); err == nil {
-			fmt.Println("Fragment exists for:", fragment)
+			//fmt.Println("Fragment exists for:", fragment)
 			err = cw.writer.AppendMarkdown(fragment)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, fmt.Errorf("failed to write fragment for code: %s error: %w", condition.Name, err))
 			}
 		} else {
-			fmt.Println("No fragment exists for:", fragment)
+			//fmt.Println("No fragment exists for:", fragment)
 		}
 	})
 }

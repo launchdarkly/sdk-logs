@@ -1,0 +1,17 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node demo.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "json-schema-to-ts": "^3.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
