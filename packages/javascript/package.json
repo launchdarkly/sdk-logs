@@ -26,7 +26,7 @@
   },
   "scripts": {
     "generate-schema": "npx json2ts ../../definition/schema/ld_log_codes.json ./tool/ld_log_codes.d.ts",
-    "generate": "npm run generate-schema && npx ts-node ./tool/generate.ts",
+    "generate": "npm run generate-schema && npx tsx ./tool/generate.ts",
     "build-cjs": "tsc src/codes.ts --types --module commonjs --outDir ./dist/cjs -d",
     "build-esm": "tsc src/codes.ts --types --module es6 --outDir ./dist/esm -d",
     "build": "npm run build-cjs && npm run build-esm"
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/node": "^20.12.7",
     "json-schema-to-ts": "^3.0.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.15.2",
     "typescript": "^5.4.5"
   }
 }
