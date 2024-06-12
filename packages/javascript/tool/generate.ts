@@ -2,7 +2,8 @@ import * as fsp from 'node:fs/promises';
 import {
   LogCodes,
   Condition,
-  Message
+  Message,
+  System
 } from './ld_log_codes';
 
 const reservedWords = [
@@ -65,11 +66,11 @@ const reservedWords = [
   "var",
   "void",
   "while",
-  "with"
+  "with",
 ];
 
-function safeParam(param: string): string {
-  if(reservedWords.includes(param)) {
+function safeIdentifier(param: string): string {
+  if (reservedWords.includes(param)) {
     return `_${param}`;
   }
   return param;
@@ -77,16 +78,24 @@ function safeParam(param: string): string {
 
 function safeMessage(message: Message): string {
   let updatedMessage = message.parameterized;
-  for(let param of Object.keys(message.parameters ?? {})) {
-    if(reservedWords.includes(param)) {
+  for (let param of Object.keys(message.parameters ?? {})) {
+    if (reservedWords.includes(param)) {
       updatedMessage = updatedMessage.replace(`\$\{${param}\}`, `\$\{_${param}\}`);
     }
   }
   return updatedMessage;
 }
 
+function capitalize(val: string) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
+function makeObjectIdentifier(input: string): string {
+  return safeIdentifier(capitalize(input));
+}
+
 function makeParams(message: Message): string {
-  return Object.keys(message.parameters || {}).map(param => `${safeParam(param)}: string`).join(', ');
+  return Object.keys(message.parameters || {}).map(param => `${safeIdentifier(param)}: string`).join(', ');
 }
 
 async function main() {
@@ -131,24 +140,26 @@ async function main() {
 
   async function writeMessageFunctionDocComment(definition: Condition) {
     await withDocComment(async () => {
-      await writeCommentLn(definition.description);
-      await writeCommentBlank();
       await writeCommentLn('Generate a log string for this code.');
       await writeCommentBlank();
       await writeCommentLn('This function will automatically include the log code.');
 
       for (let paramName of Object.keys(definition.message.parameters || {})) {
         const paramDef = definition.message.parameters![paramName];
-        await writeCommentParamLn(safeParam(paramName), paramDef);
+        await writeCommentParamLn(safeIdentifier(paramName), paramDef);
       }
     });
   }
 
   async function writeCodeFunctionDocComment(definition: Condition) {
     await withDocComment(async () => {
-      await writeCommentLn(definition.description);
-      await writeCommentBlank();
       await writeCommentLn('Get the code for this condition.');
+    });
+  }
+
+  async function writeGenericDocComment(definition: {description: string}) {
+    await withDocComment(async () => {
+      await writeCommentLn(definition.description);
     });
   }
 
@@ -158,28 +169,36 @@ async function main() {
   await writeLn('// This code is automatically generated and should not be manually edited.');
   await writeLn('');
 
-  for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
-    const [systemName, sys] = Object.entries(definitions.systems).find(([_, value]) => {
-      return value.specifier == condition.system
-    })!;
+  await scoped('export const Logs = {', '}', async () => {
+    for (let [systemName, system] of Object.entries(definitions.systems)) {
+      await writeGenericDocComment(system);
+      await scoped(`${makeObjectIdentifier(systemName)}: {`, `},`, async () => {
+        for (let [clsName, cls] of Object.entries(definitions.classes)) {
+          await writeGenericDocComment(cls);
+          await scoped(`${capitalize(clsName)}: {`, '},', async () => {
+            for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
+              if (condition.system == system.specifier && condition.class == cls.specifier) {
+                await writeCondition(condition, conditionCode);
+              }
+            }
+          });
+        }
+      });
+    }
+  });
 
-    const [className, cls] = Object.entries(definitions.classes).find(([_, value]) => {
-      return value.specifier == condition.class
-    })!;
+  async function writeCondition(condition: Condition, conditionCode: string) {
+    await writeGenericDocComment(condition);
+    await scoped(`${makeObjectIdentifier(condition.name)}: {`, '},', async () => {
+      await writeMessageFunctionDocComment(condition);
+      await scoped(`message:(${makeParams(condition.message)}) => {`, '},', async () => {
+        await writeLn(`return \`${conditionCode} ${safeMessage(condition.message)}\`;`);
+      });
 
-    await writeCondition(condition, systemName, className, conditionCode);
-  }
-
-
-  async function writeCondition(condition: Condition, systemName: string, className: string, conditionCode: string) {
-    await writeMessageFunctionDocComment(condition);
-    await scoped(`export function ${systemName}_${className}_${condition.name}(${makeParams(condition.message)}): string {`, '}', async () => {
-      await writeLn(`return \`${conditionCode} ${safeMessage(condition.message)}\`;`);
-    });
-
-    await writeCodeFunctionDocComment(condition);
-    await scoped(`export function ${systemName}_${className}_${condition.name}_code(): string {`, '}', async () => {
-      await writeLn(`return '${conditionCode}';`);
+      await writeCodeFunctionDocComment(condition);
+      await scoped(`code:() => {`, '},', async () => {
+        await writeLn(`return '${conditionCode}';`);
+      });
     });
   }
 }
