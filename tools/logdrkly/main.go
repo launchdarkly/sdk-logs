@@ -83,6 +83,9 @@ func main() {
 	case "validate":
 		validateCodes(codePath, schemaPath)
 		fmt.Println("Codes matched schema.")
+	case "explain":
+		validateCodes(codePath, schemaPath)
+		commands.RunExplainCommand(codePath)
 	default:
 		fmt.Printf("Unrecognized command: %s\n", os.Args[1])
 		usage()
