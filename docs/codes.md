@@ -1,7 +1,9 @@
 # LaunchDarkly Log Codes
 
-## Introduction
+## Introduction 
 
 Log codes provide a standardized way to reference different log conditions across LaunchDarkly SDKs.
 
 ## Codes
+
+
