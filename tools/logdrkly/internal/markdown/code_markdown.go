@@ -44,7 +44,8 @@ func GenMarkdownCondition(codes *logs.LdLogCodesJson, fragmentPath string, code 
 	if !present {
 		return "", errors.New("code does not exist")
 	}
-	cw.writeCondition(code, condition)
+	// When generating markdown for potential UI we don't want the log output.
+	cw.writeCondition(code, condition, false)
 	return cw.writer.String(), nil
 }
 
@@ -61,7 +62,7 @@ func (cw *codeMarkdownWriter) writeIntroduction() {
 	}
 }
 
-func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Condition) {
+func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Condition, verbose bool) {
 	sectionName := fmt.Sprintf("%s - %s", code, condition.Name)
 	cw.writer.WriteSection(sectionName, func() {
 		sysName, _, _ := collections.MapFind(cw.codes.Systems, func(s string, system logs.System) bool {
@@ -70,7 +71,9 @@ func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Conditi
 		className, _, _ := collections.MapFind(cw.codes.Classes, func(s string, class logs.Class) bool {
 			return class.Specifier == condition.Class
 		})
-		//fmt.Println("Writing condition:", condition.Name, "of system", sysName, "with class", className)
+		if verbose {
+			fmt.Println("Writing condition:", condition.Name, "of system", sysName, "with class", className)
+		}
 
 		cw.writer.WriteLn(condition.Description)
 		cw.writer.WriteBlankLn()
@@ -95,13 +98,15 @@ func (cw *codeMarkdownWriter) writeCondition(code string, condition logs.Conditi
 		fragment := fmt.Sprintf("%s/%s_%s_%s.md", cw.fragmentPath, sysName, className, condition.Name)
 
 		if _, err := os.Stat(fragment); err == nil {
-			//fmt.Println("Fragment exists for:", fragment)
+			if verbose {
+				fmt.Println("Fragment exists for:", fragment)
+			}
 			err = cw.writer.AppendMarkdown(fragment)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, fmt.Errorf("failed to write fragment for code: %s error: %w", condition.Name, err))
 			}
-		} else {
-			//fmt.Println("No fragment exists for:", fragment)
+		} else if verbose {
+			fmt.Println("No fragment exists for:", fragment)
 		}
 	})
 }
@@ -116,7 +121,7 @@ func (cw *codeMarkdownWriter) writeSystem(name string) {
 			return condition.System == system.Specifier
 		})
 		collections.MapForEachOrdered(conditions, func(code string, condition logs.Condition) {
-			cw.writeCondition(code, condition)
+			cw.writeCondition(code, condition, true)
 		})
 	})
 }
