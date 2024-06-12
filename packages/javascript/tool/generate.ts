@@ -169,25 +169,27 @@ async function main() {
   await writeLn('// This code is automatically generated and should not be manually edited.');
   await writeLn('');
 
-  for (let [systemName, system] of Object.entries(definitions.systems)) {
-    await writeGenericDocComment(system);
-    await scoped(`export const ${makeObjectIdentifier(systemName)} = {`, `}`, async () => {
-      for (let [clsName, cls] of Object.entries(definitions.classes)) {
-        await writeGenericDocComment(cls);
-        await scoped(`${capitalize(clsName)}: {`, `},`, async () => {
-          for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
-            if (condition.system == system.specifier && condition.class == cls.specifier) {
-              await writeCondition(condition, conditionCode);
+  await scoped('export const Logs = {', '}', async () => {
+    for (let [systemName, system] of Object.entries(definitions.systems)) {
+      await writeGenericDocComment(system);
+      await scoped(`${makeObjectIdentifier(systemName)}: {`, `},`, async () => {
+        for (let [clsName, cls] of Object.entries(definitions.classes)) {
+          await writeGenericDocComment(cls);
+          await scoped(`${capitalize(clsName)}: {`, '},', async () => {
+            for (let [conditionCode, condition] of Object.entries(definitions.conditions)) {
+              if (condition.system == system.specifier && condition.class == cls.specifier) {
+                await writeCondition(condition, conditionCode);
+              }
             }
-          }
-        });
-      }
-    });
-  }
+          });
+        }
+      });
+    }
+  });
 
   async function writeCondition(condition: Condition, conditionCode: string) {
     await writeGenericDocComment(condition);
-    await scoped(`${makeObjectIdentifier(condition.name)}: {`, `},`, async () => {
+    await scoped(`${makeObjectIdentifier(condition.name)}: {`, '},', async () => {
       await writeMessageFunctionDocComment(condition);
       await scoped(`message:(${makeParams(condition.message)}) => {`, '},', async () => {
         await writeLn(`return \`${conditionCode} ${safeMessage(condition.message)}\`;`);
