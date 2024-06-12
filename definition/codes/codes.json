@@ -1,8 +1,200 @@
 {
   "classes": {
+    "debug": {
+      "description": "Codes associated with debugging.",
+      "specifier": 0
+    },
+    "implementationError": {
+      "description": "An error that should not happen in correctly implemented code. For instance missing a condition in a switch statement.",
+      "specifier": 6
+    },
+    "informative": {
+      "description": "Codes for informative messages logged during normal operations.",
+      "specifier": 1
+    },
+    "runtimeError": {
+      "description": "A non-usage error which interferes with operation and likely requires user intervention.",
+      "specifier": 5
+    },
+    "runtimeWarning": {
+      "description": "An unexpected, but recoverable, runtime issue not associated with usage.",
+      "specifier": 4
+    },
+    "usageError": {
+      "description": "An error which represents a mis-use of an API and impedes correct functionality.",
+      "specifier": 3
+    },
+    "usageWarning": {
+      "description": "A warning about the usage of an API or configuration. The usage or configuration does not interfere with operation, but is not recommended or may result in unexpected behavior.",
+      "specifier": 2
+    }
   },
   "conditions": {
+    "0:2:0": {
+      "class": 2,
+      "description": "There is a proxy configuration, and that configuration specifies to use TLS, but it is not using HTTPS authorization. This is likely not a desired configuration.",
+      "message": {
+        "parameterized": "Proxy configured with TLS options, but is not using HTTPS authentication."
+      },
+      "name": "proxyTlsAuth",
+      "specifier": 0,
+      "system": 0
+    },
+    "10:0:0": {
+      "class": 0,
+      "description": "The connection has received invalid JSON. The error should have been logged with code 10:5:0. This debug log provides additional information. This should be logged after the error message.",
+      "message": {
+        "parameterized": "Invalid JSON follows: ${json}",
+        "parameters": {
+          "json": "The JSON data that was invalid."
+        }
+      },
+      "name": "invalidJsonDebug",
+      "specifier": 0,
+      "system": 10
+    },
+    "10:5:0": {
+      "class": 5,
+      "description": "The LaunchDarkly data source received a payload with invalid JSON.",
+      "message": {
+        "parameterized": "${connection} connection received invalid data in \"${type}\" message.",
+        "parameters": {
+          "connection": "The type of the connection. Should be capitalized. Examples: \"Streaming\" or \"Polling\"",
+          "type": "The type of the message. For example \"put\", \"patch\", or \"delete\"."
+        }
+      },
+      "name": "invalidJson",
+      "specifier": 0,
+      "system": 10
+    },
+    "10:5:1": {
+      "class": 5,
+      "description": "The data source received an invalid payload. The JSON was correctly formed, but the data did not match the expected schema.",
+      "message": {
+        "parameterized": "${connection} connection received invalid data in \"${type}\" message.",
+        "parameters": {
+          "connection": "The type of the connection. Should be capitalized. Examples: \"Streaming\" or \"Polling\"",
+          "type": "The type of the message. For example \"put\", \"patch\", or \"delete\""
+        }
+      },
+      "name": "invalidPayload",
+      "specifier": 1,
+      "system": 10
+    },
+    "1:4:0": {
+      "class": 4,
+      "description": "Initialization, or a function to wait for initialization, was done without a timeout.",
+      "message": {
+        "parameterized": "The ${function} function was called without a timeout specified. In a future version a default timeout will be applied.",
+        "parameters": {
+          "function": "The function which was called without a timeout."
+        }
+      },
+      "name": "missingInitTimeout",
+      "specifier": 0,
+      "system": 1
+    },
+    "8:0:0": {
+      "class": 0,
+      "description": "Flushing of an event batch failed.",
+      "message": {
+        "parameterized": "Failed to flush events. Reason: ${error}",
+        "parameters": {
+          "error": "The reason the flush failed."
+        }
+      },
+      "name": "flushFailed",
+      "specifier": 0,
+      "system": 8
+    },
+    "8:0:1": {
+      "class": 0,
+      "description": "The event processor has started.",
+      "message": {
+        "parameterized": "Started event processor."
+      },
+      "name": "eventProcessorStarted",
+      "specifier": 1,
+      "system": 8
+    },
+    "8:0:2": {
+      "class": 0,
+      "description": "The event processor is flushing events.",
+      "message": {
+        "parameterized": "Flushing ${eventCount} events.",
+        "parameters": {
+          "eventCount": "The number of events in the batch being flushed."
+        }
+      },
+      "name": "flushingEvents",
+      "specifier": 2,
+      "system": 8
+    },
+    "8:0:3": {
+      "class": 0,
+      "description": "Event delivery failed, but a retry attempt is going to be made.",
+      "message": {
+        "parameterized": "Encountered a problem sending events, will retry."
+      },
+      "name": "eventRetry",
+      "specifier": 3,
+      "system": 8
+    },
+    "8:4:0": {
+      "class": 4,
+      "description": "The capacity of the event queue was exceeded. The user may want to increase the capacity, or increase the frequency of flushing. In this situation some events have already been dropped. We only want to log this warning the first time it happens.",
+      "message": {
+        "parameterized": "Exceeded event queue capacity. Increase capacity, or decrease flushing interval, to avoid dropping events."
+      },
+      "name": "eventCapacityExceeded",
+      "specifier": 0,
+      "system": 8
+    }
   },
   "systems": {
+    "client": {
+      "description": "Logs associated with the functionality of the client. Errors that can be covered by a more specific system, like \"evaluation\" should use that system.",
+      "specifier": 1
+    },
+    "configuration": {
+      "description": "Codes associated with SDK configuration.",
+      "specifier": 0
+    },
+    "dataSource": {
+      "description": "Messages that apply to multiple data sources. Not specific to streaming or polling.",
+      "specifier": 10
+    },
+    "evaluation": {
+      "description": "Codes associated with evaluation.",
+      "specifier": 7
+    },
+    "events": {
+      "description": "Codes associated with events.",
+      "specifier": 8
+    },
+    "generalNetwork": {
+      "description": "Codes associated with network conditions and failures. When possible use \"streaming\", \"polling\", or \"events\" instead, or log something in one of those systems in addition to the general network error. For instance an event source may log a \"generalNetwork\"  condition and the streaming data source a \"sreaming\" condition.",
+      "specifier": 4
+    },
+    "hooks": {
+      "description": "Codes associated with hooks.",
+      "specifier": 9
+    },
+    "memoryStore": {
+      "description": "Codes associated with the in-memory store for flags/segments.",
+      "specifier": 5
+    },
+    "persistentStore": {
+      "description": "Codes associated with a persistent store.",
+      "specifier": 6
+    },
+    "polling": {
+      "description": "Codes associated with LaunchDarkly polling connections and payloads.",
+      "specifier": 3
+    },
+    "streaming": {
+      "description": "Codes associated with LaunchDarkly streaming connections and payloads.",
+      "specifier": 2
+    }
   }
 }
