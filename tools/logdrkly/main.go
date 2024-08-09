@@ -16,7 +16,7 @@ const defaultFragmentPath = "../../docs/fragments"
 func usage() {
 	_, _ = fmt.Fprintf(os.Stderr, `Create and manage log specifiers
 		USAGE:
-			log <command>
+			logdrkly <command>
 
 		The default configuration of this command expects to be executed from its source directory.
 
@@ -36,6 +36,7 @@ func usage() {
 			supersede: Indicate a log code has been superseded.
 			document: Generate markdown documentation for log codes.
 			validate: Validate codes against the schema.
+			explain: Explain a specific log code.
 		`, defaultCodesPath, defaultCodesSchemaPath, defaultDocPath, defaultFragmentPath)
 }
 
